@@ -157,22 +157,40 @@ final class StreakEngine {
       cursor = cursor.addDays(1);
     }
 
-    // 30-day global consistency
+    // 30-day global consistency (accurately weighting weekly-quota habits)
     var scheduledSlots = 0;
     var fulfilledSlots = 0;
     final windowStart = today.subtractDays(29);
-    for (var i = 0; i < 30; i++) {
-      final date = windowStart.addDays(i);
-      final dayLogs = logsByDate[date] ?? const [];
-      for (final habit in activeHabits) {
-        if (date < habit.createdAt) continue;
+    for (final habit in activeHabits) {
+      if (habit.schedule case TimesPerWeekSchedule(:final timesPerWeek)) {
+        final effectiveStart =
+            habit.createdAt > windowStart ? habit.createdAt : windowStart;
+        if (effectiveStart > today) continue;
+        final activeDays = today.differenceInDays(effectiveStart) + 1;
+        final expected = ((activeDays / 7.0) * timesPerWeek).ceil().clamp(1, 30);
+        var completed = 0;
+        for (var i = 0; i < 30; i++) {
+          final date = windowStart.addDays(i);
+          if (date < effectiveStart || date > today) continue;
+          final dayLogs = logsByDate[date] ?? const [];
+          final log = dayLogs.where((l) => l.habitId == habit.id).firstOrNull;
+          if (log?.isCompleted == true) completed++;
+        }
+        scheduledSlots += expected;
+        fulfilledSlots += completed.clamp(0, expected);
+      } else {
         final strategy = ScheduleStrategy.forSchedule(habit.schedule);
-        if (!strategy.isScheduledOn(date)) continue;
-        final log = dayLogs.where((l) => l.habitId == habit.id).firstOrNull;
-        if (log?.isRestDay == true) continue;
-        scheduledSlots++;
-        if (log?.isCompleted == true) {
-          fulfilledSlots++;
+        for (var i = 0; i < 30; i++) {
+          final date = windowStart.addDays(i);
+          if (date < habit.createdAt) continue;
+          if (!strategy.isScheduledOn(date)) continue;
+          final dayLogs = logsByDate[date] ?? const [];
+          final log = dayLogs.where((l) => l.habitId == habit.id).firstOrNull;
+          if (log?.isRestDay == true) continue;
+          scheduledSlots++;
+          if (log?.isCompleted == true) {
+            fulfilledSlots++;
+          }
         }
       }
     }

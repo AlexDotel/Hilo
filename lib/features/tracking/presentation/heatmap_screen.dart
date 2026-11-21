@@ -22,7 +22,7 @@ class _HeatmapScreenState extends ConsumerState<HeatmapScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.hiloColors;
-    final today = ref.watch(clockProvider).today();
+    final today = ref.watch(currentDateProvider);
     final habits = ref.watch(activeHabitsProvider).asData?.value ?? const [];
     final logs = ref.watch(yearLogsProvider).asData?.value ?? const [];
     final streakEngine = ref.watch(streakEngineProvider);

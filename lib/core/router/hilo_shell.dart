@@ -1,10 +1,10 @@
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hilo/core/di/providers.dart';
 import 'package:hilo/features/habits/presentation/habit_editor_sheet.dart';
 import 'package:hilo/features/habits/presentation/habits_screen.dart';
 import 'package:hilo/features/tracking/presentation/heatmap_screen.dart';
 import 'package:hilo/features/tracking/presentation/today_screen.dart';
+import 'package:material_ui/material_ui.dart';
 
 class HiloShell extends ConsumerStatefulWidget {
   const HiloShell({super.key, this.requireBiometricOnStart = false});
@@ -15,23 +15,61 @@ class HiloShell extends ConsumerStatefulWidget {
   ConsumerState<HiloShell> createState() => _HiloShellState();
 }
 
-class _HiloShellState extends ConsumerState<HiloShell> {
+class _HiloShellState extends ConsumerState<HiloShell>
+    with WidgetsBindingObserver {
   int _currentIndex = 0;
   late bool _locked;
+  bool _authenticating = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _locked = widget.requireBiometricOnStart;
     if (_locked) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _unlock());
     }
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      if (!_authenticating) {
+        _checkAndLockOnBackground();
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      ref.read(currentDateProvider.notifier).refresh();
+      if (_locked && !_authenticating) {
+        _unlock();
+      }
+    }
+  }
+
+  Future<void> _checkAndLockOnBackground() async {
+    final enabled =
+        await ref.read(secureKeyStoreProvider).isBiometricLockEnabled();
+    if (mounted && enabled && !_locked) {
+      setState(() => _locked = true);
+    }
+  }
+
   Future<void> _unlock() async {
-    final ok = await ref.read(biometricGuardProvider).authenticate();
-    if (mounted && ok) {
-      setState(() => _locked = false);
+    if (_authenticating) return;
+    _authenticating = true;
+    try {
+      final ok = await ref.read(biometricGuardProvider).authenticate();
+      if (mounted && ok) {
+        setState(() => _locked = false);
+      }
+    } finally {
+      _authenticating = false;
     }
   }
 

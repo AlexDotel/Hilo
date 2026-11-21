@@ -60,7 +60,12 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
             views.setImageViewBitmap(R.id.compact_heatmap_image, bitmap)
 
             if (habitId.isNotEmpty()) {
-                val uri = Uri.parse("hilo://widget/toggle?id=$habitId")
+                val uri = Uri.Builder()
+                    .scheme("hilo")
+                    .authority("widget")
+                    .appendPath("toggle")
+                    .appendQueryParameter("id", habitId)
+                    .build()
                 val pendingIntent = HomeWidgetBackgroundIntent.getBroadcast(context, uri)
                 views.setOnClickPendingIntent(R.id.compact_action_btn, pendingIntent)
             }

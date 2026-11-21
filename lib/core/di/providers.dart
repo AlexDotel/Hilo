@@ -86,6 +86,22 @@ final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
   ThemeModeNotifier.new,
 );
 
+class CurrentDateNotifier extends Notifier<LocalDate> {
+  @override
+  LocalDate build() => ref.watch(clockProvider).today();
+
+  void refresh() {
+    final latest = ref.read(clockProvider).today();
+    if (latest != state) {
+      state = latest;
+    }
+  }
+}
+
+final currentDateProvider = NotifierProvider<CurrentDateNotifier, LocalDate>(
+  CurrentDateNotifier.new,
+);
+
 /// Reactive stream of active habits.
 final activeHabitsProvider = StreamProvider<List<Habit>>((ref) {
   return ref.watch(habitRepositoryProvider).watchActiveHabits();
@@ -98,7 +114,7 @@ final allHabitsProvider = StreamProvider<List<Habit>>((ref) {
 
 /// Reactive stream of logs for the last 52 weeks (365 days).
 final yearLogsProvider = StreamProvider<List<HabitLog>>((ref) {
-  final today = ref.watch(clockProvider).today();
+  final today = ref.watch(currentDateProvider);
   final from = today.subtractDays(365);
   return ref.watch(logRepositoryProvider).watchLogsInRange(from, today);
 });

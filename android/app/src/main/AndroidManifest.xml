@@ -52,19 +52,14 @@
                 android:resource="@xml/hilo_widget_compact_info" />
         </receiver>
 
-        <!-- Background check-in receiver for home_widget -->
+        <!-- Background check-in receiver for home_widget (private to explicit widget PendingIntents) -->
         <receiver
             android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="es.antonborri.home_widget.action.BACKGROUND" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name="es.antonborri.home_widget.HomeWidgetBackgroundService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
 
         <meta-data
             android:name="flutterEmbedding"

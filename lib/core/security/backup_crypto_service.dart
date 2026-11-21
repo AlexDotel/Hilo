@@ -93,10 +93,29 @@ final class BackupCryptoService {
         );
       }
 
-      final salt = base64Decode(decoded['salt'] as String);
-      final nonce = base64Decode(decoded['nonce'] as String);
-      final macBytes = base64Decode(decoded['mac'] as String);
-      final cipherText = base64Decode(decoded['ciphertext'] as String);
+      final saltB64 = decoded['salt'];
+      final nonceB64 = decoded['nonce'];
+      final macB64 = decoded['mac'];
+      final cipherB64 = decoded['ciphertext'];
+      if (saltB64 is! String ||
+          nonceB64 is! String ||
+          macB64 is! String ||
+          cipherB64 is! String) {
+        return const Failure(
+          ValidationFailure('Campos criptográficos faltantes o inválidos.'),
+        );
+      }
+
+      final salt = base64Decode(saltB64);
+      final nonce = base64Decode(nonceB64);
+      final macBytes = base64Decode(macB64);
+      final cipherText = base64Decode(cipherB64);
+
+      if (salt.length != 16 || nonce.length != 12 || macBytes.length != 16) {
+        return const Failure(
+          SecurityFailure('Longitudes criptográficas inválidas en el respaldo.'),
+        );
+      }
 
       final pbkdf2 = Pbkdf2(
         macAlgorithm: Hmac.sha256(),

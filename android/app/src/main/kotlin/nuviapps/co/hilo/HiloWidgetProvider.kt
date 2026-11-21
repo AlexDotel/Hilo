@@ -99,7 +99,12 @@ class HiloWidgetProvider : HomeWidgetProvider() {
         views.setTextViewText(checkId, if (done) "●" else "○")
 
         if (id.isNotEmpty()) {
-            val uri = Uri.parse("hilo://widget/toggle?id=$id")
+            val uri = Uri.Builder()
+                .scheme("hilo")
+                .authority("widget")
+                .appendPath("toggle")
+                .appendQueryParameter("id", id)
+                .build()
             val pendingIntent = HomeWidgetBackgroundIntent.getBroadcast(context, uri)
             views.setOnClickPendingIntent(rowId, pendingIntent)
         }

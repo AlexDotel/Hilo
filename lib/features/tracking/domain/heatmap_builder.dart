@@ -114,11 +114,30 @@ final class HeatmapBuilder {
             hasRest = true;
             continue;
           }
-          if (strategy.isScheduledOn(date)) {
-            scheduled++;
-          }
-          if (log?.isCompleted == true) {
-            completed++;
+          final doneToday = log?.isCompleted == true;
+          if (habit.schedule case TimesPerWeekSchedule(:final timesPerWeek)) {
+            final weekStart = date.startOfWeek;
+            var weekCompleted = 0;
+            for (var d = 0; d < 7; d++) {
+              final wd = weekStart.addDays(d);
+              final wLogs = logsByDate[wd] ?? const [];
+              if (wLogs.any((l) => l.habitId == habit.id && l.isCompleted)) {
+                weekCompleted++;
+              }
+            }
+            if (doneToday) {
+              scheduled++;
+              completed++;
+            } else if (weekCompleted < timesPerWeek) {
+              scheduled++;
+            }
+          } else {
+            if (strategy.isScheduledOn(date)) {
+              scheduled++;
+            }
+            if (doneToday) {
+              completed++;
+            }
           }
         }
 

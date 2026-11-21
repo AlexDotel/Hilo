@@ -93,6 +93,12 @@ class HiloDatabase extends _$HiloDatabase {
 }
 
 QueryExecutor _openEncryptedConnection(String hexKey) {
+  if (!RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(hexKey)) {
+    throw StateError(
+      'Invalid SQLCipher key format: refusing to open unencrypted database.',
+    );
+  }
+
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
     final file = File(p.join(dir.path, 'hilo_encrypted.sqlite'));
@@ -100,11 +106,8 @@ QueryExecutor _openEncryptedConnection(String hexKey) {
     return NativeDatabase.createInBackground(
       file,
       setup: (rawDb) {
-        // Apply 256-bit raw hex key via SQLCipher (validated 64 hex chars).
-        if (RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(hexKey)) {
-          rawDb.execute("PRAGMA key = \"x'$hexKey'\";");
-          rawDb.execute('PRAGMA cipher_memory_security = ON;');
-        }
+        rawDb.execute("PRAGMA key = \"x'$hexKey'\";");
+        rawDb.execute('PRAGMA cipher_memory_security = ON;');
         rawDb.execute('PRAGMA foreign_keys = ON;');
       },
     );

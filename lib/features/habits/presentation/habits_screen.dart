@@ -294,29 +294,35 @@ class _SecurityAndThemeSheetState
 
   Future<void> _exportBackupDialog(BuildContext context) async {
     final passController = TextEditingController();
-    final passphrase = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Contraseña del respaldo'),
-        content: TextField(
-          controller: passController,
-          obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'Mínimo 8 caracteres',
+    String? passphrase;
+    try {
+      passphrase = await showDialog<String>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Contraseña del respaldo'),
+          content: TextField(
+            controller: passController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Mínimo 8 caracteres',
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, passController.text),
+              child: const Text('Cifrar'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, passController.text),
-            child: const Text('Cifrar'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      passController.clear();
+      passController.dispose();
+    }
     if (passphrase == null || !context.mounted) return;
 
     final result =
@@ -343,48 +349,62 @@ class _SecurityAndThemeSheetState
   Future<void> _importBackupDialog(BuildContext context) async {
     final dataController = TextEditingController();
     final passController = TextEditingController();
+    String envelope = '';
+    String passphrase = '';
+    bool? confirmed;
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Importar respaldo .hilo'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: dataController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Contenido cifrado (.hilo)',
+    try {
+      confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Importar respaldo .hilo'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: dataController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Contenido cifrado (.hilo)',
+                ),
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Contraseña',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancelar'),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: passController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Contraseña',
-              ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Importar'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Importar'),
-          ),
-        ],
-      ),
-    );
+      );
+      if (confirmed == true) {
+        envelope = dataController.text.trim();
+        passphrase = passController.text;
+      }
+    } finally {
+      dataController.clear();
+      passController.clear();
+      dataController.dispose();
+      passController.dispose();
+    }
 
     if (confirmed != true || !context.mounted) return;
     final res = await ref.read(backupServiceProvider).importEncrypted(
-          encryptedEnvelope: dataController.text.trim(),
-          passphrase: passController.text,
+          encryptedEnvelope: envelope,
+          passphrase: passphrase,
         );
     if (!context.mounted) return;
     res.when(

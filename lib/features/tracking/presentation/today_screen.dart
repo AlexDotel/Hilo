@@ -22,7 +22,7 @@ class TodayScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = context.hiloColors;
-    final today = ref.watch(clockProvider).today();
+    final today = ref.watch(currentDateProvider);
     final habitsAsync = ref.watch(activeHabitsProvider);
     final logsAsync = ref.watch(yearLogsProvider);
     final streakEngine = ref.watch(streakEngineProvider);
@@ -457,7 +457,7 @@ class _HabitCheckInCard extends ConsumerWidget {
           ),
         );
       },
-    );
+    ).whenComplete(noteController.dispose);
   }
 }
 

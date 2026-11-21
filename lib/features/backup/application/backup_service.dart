@@ -5,7 +5,8 @@ import 'package:hilo/features/habits/domain/habit.dart';
 import 'package:hilo/features/habits/domain/habit_repository.dart';
 import 'package:hilo/features/tracking/domain/habit_log.dart';
 
-/// Application service exporting and importing encrypted `.hilo` local backups.
+/// Application service exporting and importing encrypted `.hilo` local backups
+/// with strict schema validation, DoS bounds, and referential integrity checks.
 final class BackupService {
   const BackupService({
     required this.habitRepository,
@@ -13,6 +14,11 @@ final class BackupService {
     required this.cryptoService,
     required this.clock,
   });
+
+  static const int maxHabits = 500;
+  static const int maxLogs = 50000;
+  static const int maxNoteLength = 500;
+  static const int maxIdLength = 64;
 
   final HabitRepository habitRepository;
   final LogRepository logRepository;
@@ -84,49 +90,154 @@ final class BackupService {
       );
     }
 
-    var importedHabits = 0;
-    for (final item in rawHabits) {
-      if (item is! Map<String, dynamic>) continue;
-      final habit = Habit(
-        id: item['id'] as String,
-        name: item['name'] as String,
-        iconKey: (item['iconKey'] as String?) ?? 'check',
-        colorHex: (item['colorHex'] as String?) ?? '#158052',
-        type: HabitType.fromName((item['type'] as String?) ?? 'binary'),
-        targetValue: ((item['targetValue'] as num?) ?? 1.0).toDouble(),
-        unit: item['unit'] as String?,
-        schedule: HabitSchedule.fromStorage(
-          (item['scheduleType'] as String?) ?? 'daily',
-          (item['scheduleConfig'] as String?) ?? '{}',
+    if (rawHabits.length > maxHabits || rawLogs.length > maxLogs) {
+      return const Failure(
+        ValidationFailure(
+          'El respaldo excede los límites seguros de registros permitidos.',
         ),
-        allowShields: (item['allowShields'] as bool?) ?? true,
-        reminderTime: item['reminderTime'] as String?,
-        sortOrder: ((item['sortOrder'] as num?) ?? 0).toInt(),
-        isArchived: (item['isArchived'] as bool?) ?? false,
-        createdAt: LocalDate.tryParse((item['createdAt'] as String?) ?? '') ??
-            clock.today(),
       );
+    }
+
+    // Phase 1: Validate all habits before writing anything to storage.
+    final validatedHabits = <Habit>[];
+    final validHabitIds = <String>{};
+
+    for (final item in rawHabits) {
+      if (item is! Map<String, dynamic>) {
+        return const Failure(
+          ValidationFailure('Elemento de hábito malformado en el respaldo.'),
+        );
+      }
+      final id = item['id'];
+      final name = item['name'];
+      if (id is! String ||
+          id.trim().isEmpty ||
+          id.length > maxIdLength ||
+          name is! String) {
+        return const Failure(
+          ValidationFailure('Hábito con identificador o nombre inválido.'),
+        );
+      }
+
+      final typeRaw = item['type'] is String ? item['type'] as String : 'binary';
+      final type = HabitType.fromName(typeRaw);
+      final targetRaw = item['targetValue'];
+      final targetValue = targetRaw is num ? targetRaw.toDouble() : 1.0;
+      final colorHex =
+          item['colorHex'] is String ? item['colorHex'] as String : '#158052';
+
+      final draftCheck = Habit.validateDraft(
+        name: name,
+        type: type,
+        targetValue: targetValue,
+        colorHex: colorHex,
+      );
+      if (draftCheck.isFailure) {
+        return Failure(draftCheck.errorOrNull!);
+      }
+
+      final scheduleType = item['scheduleType'] is String
+          ? item['scheduleType'] as String
+          : 'daily';
+      final scheduleConfig = item['scheduleConfig'] is String
+          ? item['scheduleConfig'] as String
+          : '{}';
+
+      final createdAtRaw =
+          item['createdAt'] is String ? item['createdAt'] as String : '';
+
+      validatedHabits.add(
+        Habit(
+          id: id.trim(),
+          name: name.trim(),
+          iconKey:
+              item['iconKey'] is String ? item['iconKey'] as String : 'check',
+          colorHex: colorHex,
+          type: type,
+          targetValue: targetValue,
+          unit: item['unit'] is String ? item['unit'] as String : null,
+          schedule: HabitSchedule.fromStorage(scheduleType, scheduleConfig),
+          allowShields:
+              item['allowShields'] is bool ? item['allowShields'] as bool : true,
+          reminderTime: item['reminderTime'] is String
+              ? item['reminderTime'] as String
+              : null,
+          sortOrder: item['sortOrder'] is num
+              ? (item['sortOrder'] as num).toInt()
+              : 0,
+          isArchived:
+              item['isArchived'] is bool ? item['isArchived'] as bool : false,
+          createdAt: LocalDate.tryParse(createdAtRaw) ?? clock.today(),
+        ),
+      );
+      validHabitIds.add(id.trim());
+    }
+
+    // Also allow logs referencing habits already existing in the local DB.
+    final existingHabits = await habitRepository.getAllHabits();
+    for (final h in existingHabits) {
+      validHabitIds.add(h.id);
+    }
+
+    // Phase 2: Validate logs and enforce referential integrity & note length.
+    final validatedLogs = <HabitLog>[];
+    for (final item in rawLogs) {
+      if (item is! Map<String, dynamic>) continue;
+      final id = item['id'];
+      final habitId = item['habitId'];
+      final dateRaw = item['date'];
+      if (id is! String ||
+          id.trim().isEmpty ||
+          id.length > maxIdLength ||
+          habitId is! String ||
+          !validHabitIds.contains(habitId.trim()) ||
+          dateRaw is! String) {
+        continue;
+      }
+
+      final parsedDate = LocalDate.tryParse(dateRaw);
+      if (parsedDate == null) continue;
+
+      final rawNote = item['note'];
+      final safeNote = rawNote is String && rawNote.trim().isNotEmpty
+          ? rawNote.trim().substring(
+                0,
+                rawNote.trim().length > maxNoteLength
+                    ? maxNoteLength
+                    : rawNote.trim().length,
+              )
+          : null;
+
+      final valueRaw = item['value'];
+      final value =
+          valueRaw is num ? valueRaw.toDouble().clamp(0.0, 100000.0) : 1.0;
+
+      validatedLogs.add(
+        HabitLog(
+          id: id.trim(),
+          habitId: habitId.trim(),
+          date: parsedDate,
+          status: LogStatus.fromName(
+            item['status'] is String ? item['status'] as String : 'completed',
+          ),
+          value: value,
+          note: safeNote,
+          updatedAtEpochMs: item['updatedAtEpochMs'] is num
+              ? (item['updatedAtEpochMs'] as num).toInt()
+              : clock.now().millisecondsSinceEpoch,
+        ),
+      );
+    }
+
+    // Phase 3: Persist validated records.
+    var importedHabits = 0;
+    for (final habit in validatedHabits) {
       final res = await habitRepository.save(habit);
       if (res.isSuccess) importedHabits++;
     }
 
-    for (final item in rawLogs) {
-      if (item is! Map<String, dynamic>) continue;
-      final parsedDate = LocalDate.tryParse((item['date'] as String?) ?? '');
-      if (parsedDate == null) continue;
-      await logRepository.upsertLog(
-        HabitLog(
-          id: item['id'] as String,
-          habitId: item['habitId'] as String,
-          date: parsedDate,
-          status: LogStatus.fromName((item['status'] as String?) ?? 'completed'),
-          value: ((item['value'] as num?) ?? 1.0).toDouble(),
-          note: item['note'] as String?,
-          updatedAtEpochMs: ((item['updatedAtEpochMs'] as num?) ??
-                  clock.now().millisecondsSinceEpoch)
-              .toInt(),
-        ),
-      );
+    for (final log in validatedLogs) {
+      await logRepository.upsertLog(log);
     }
 
     return Success(importedHabits);

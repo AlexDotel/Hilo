@@ -320,12 +320,23 @@ class _HabitEditorSheetState extends ConsumerState<_HabitEditorSheet> {
   }
 
   Future<void> _submit() async {
+    double target = 1.0;
+    if (_type == HabitType.quantitative) {
+      final parsed = double.tryParse(_targetController.text.trim());
+      if (parsed == null || parsed <= 0 || parsed > 10000) {
+        setState(() {
+          _errorText = 'Ingresa una meta numérica válida mayor que 0.';
+        });
+        return;
+      }
+      target = parsed;
+    }
+
     setState(() {
       _saving = true;
       _errorText = null;
     });
 
-    final target = double.tryParse(_targetController.text.trim()) ?? 1.0;
     final schedule = switch (_scheduleType) {
       ScheduleType.daily => const DailySchedule(),
       ScheduleType.specificDays => SpecificDaysSchedule(_selectedWeekdays),
