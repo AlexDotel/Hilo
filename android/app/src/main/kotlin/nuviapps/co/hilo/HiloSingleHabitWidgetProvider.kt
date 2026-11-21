@@ -49,11 +49,11 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
             views.setTextViewText(R.id.compact_status, if (done) "Completado hoy" else "Toca + para registrar")
             views.setTextViewText(R.id.compact_action_btn, if (done) "✓" else "+")
 
-            val levels = parseLevels(firstHabit?.optJSONArray("miniGrid"), 112)
+            val levels = parseTrailingLevels(firstHabit?.optJSONArray("miniGrid"), 84)
             val bitmap = HeatmapBitmapRenderer.render(
                 context = context,
                 levels = levels,
-                columns = 16,
+                columns = 12,
                 rows = 7,
                 cellSizeDp = 11f,
                 gapDp = 2.5f,
@@ -76,12 +76,15 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
         }
     }
 
-    private fun parseLevels(array: JSONArray?, expectedSize: Int): IntArray {
+    private fun parseTrailingLevels(array: JSONArray?, expectedSize: Int): IntArray {
         val result = IntArray(expectedSize)
-        if (array == null) return result
-        val count = minOf(array.length(), expectedSize)
+        if (array == null || array.length() == 0) return result
+        val srcLen = array.length()
+        val start = (srcLen - expectedSize).coerceAtLeast(0)
+        val count = minOf(srcLen, expectedSize)
+        val destOffset = expectedSize - count
         for (i in 0 until count) {
-            result[i] = array.optInt(i, 0).coerceIn(0, 4)
+            result[destOffset + i] = array.optInt(start + i, 0).coerceIn(0, 4)
         }
         return result
     }

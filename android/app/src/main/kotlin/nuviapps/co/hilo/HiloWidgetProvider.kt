@@ -70,6 +70,15 @@ class HiloWidgetProvider : HomeWidgetProvider() {
                 titleId = R.id.habit_title_2,
                 progressId = R.id.habit_progress_2,
             )
+            bindHabitRow(
+                context = context,
+                views = views,
+                habit = habits.optJSONObject(2),
+                rowId = R.id.habit_row_3,
+                checkId = R.id.habit_check_3,
+                titleId = R.id.habit_title_3,
+                progressId = R.id.habit_progress_3,
+            )
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
