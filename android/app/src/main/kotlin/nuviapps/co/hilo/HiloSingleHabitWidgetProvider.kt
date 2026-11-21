@@ -12,8 +12,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * 2x2 Compact Android Home Screen widget for a single highlighted habit
- * with its 5-week emerald heatmap and one-tap '+' check-in button.
+ * 4x2 Wide Android Home Screen widget for a single highlighted habit
+ * matching the full-width 16-week GitHub heatmap layout with streak badge
+ * and one-tap check-in button.
  */
 class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
 
@@ -34,7 +35,7 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
                 context,
                 MainActivity::class.java,
             )
-            views.setOnClickPendingIntent(R.id.compact_title, launchIntent)
+            views.setOnClickPendingIntent(R.id.compact_header, launchIntent)
 
             val title = firstHabit?.optString("title", "Hilo") ?: "Hilo"
             val weekly = firstHabit?.optString("weekly", "Crea un hábito") ?: "Crea un hábito"
@@ -43,19 +44,20 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
             val habitId = firstHabit?.optString("id", "") ?: ""
 
             views.setTextViewText(R.id.compact_title, title)
+            views.setTextViewText(R.id.compact_streak_badge, "${streak}d")
             views.setTextViewText(R.id.compact_weekly, weekly)
-            views.setTextViewText(R.id.compact_streak, "Racha actual: ${streak}d")
+            views.setTextViewText(R.id.compact_status, if (done) "Completado hoy" else "Toca + para registrar")
             views.setTextViewText(R.id.compact_action_btn, if (done) "✓" else "+")
 
-            val miniLevels = parseLevels(firstHabit?.optJSONArray("miniGrid"), 45)
+            val levels = parseLevels(firstHabit?.optJSONArray("miniGrid"), 112)
             val bitmap = HeatmapBitmapRenderer.render(
                 context = context,
-                levels = miniLevels,
-                columns = 9,
-                rows = 5,
-                cellSizeDp = 12f,
-                gapDp = 2.8f,
-                isDark = false,
+                levels = levels,
+                columns = 16,
+                rows = 7,
+                cellSizeDp = 11f,
+                gapDp = 2.5f,
+                isDark = true,
             )
             views.setImageViewBitmap(R.id.compact_heatmap_image, bitmap)
 

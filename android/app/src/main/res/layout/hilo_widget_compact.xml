@@ -2,27 +2,50 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/hilo_widget_bg_light"
+    android:background="@drawable/hilo_widget_bg_dark"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="14dp">
 
-    <TextView
-        android:id="@+id/compact_title"
+    <LinearLayout
+        android:id="@+id/compact_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Hilo"
-        android:textColor="#1C1917"
-        android:textSize="15sp"
-        android:textStyle="bold" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/compact_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Hilo"
+            android:textColor="#F5F5F4"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/compact_streak_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/hilo_widget_badge_bg"
+            android:paddingLeft="10dp"
+            android:paddingTop="3dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="3dp"
+            android:text="0d"
+            android:textColor="#3CD08B"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/compact_heatmap_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_weight="1"
         android:contentDescription="Mapa de calor del hábito"
         android:scaleType="fitCenter" />
@@ -37,8 +60,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingEnd="6dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingEnd="8dp">
 
             <TextView
                 android:id="@+id/compact_weekly"
@@ -46,18 +69,18 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#1C1917"
-                android:textSize="11.5sp"
+                android:textColor="#F5F5F4"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/compact_streak"
+                android:id="@+id/compact_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#78716C"
-                android:textSize="10.5sp" />
+                android:textColor="#A1A1AA"
+                android:textSize="11sp" />
         </LinearLayout>
 
         <TextView

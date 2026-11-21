@@ -39,10 +39,10 @@
                 android:resource="@xml/hilo_widget_standard_info" />
         </receiver>
 
-        <!-- 2x2 Compact Single-Habit Widget -->
+        <!-- 4x2 Single-Habit Heatmap Widget -->
         <receiver
             android:name=".HiloSingleHabitWidgetProvider"
-            android:label="Hilo · Hábito Rápido (2x2)"
+            android:label="Hilo · Hábito Individual (4x2)"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
