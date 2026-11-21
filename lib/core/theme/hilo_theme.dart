@@ -147,7 +147,11 @@ abstract final class HiloHabitPalette {
 }
 
 abstract final class HiloTheme {
+  static const String displayFont = 'PlusJakartaSans';
+  static const String bodyFont = 'Inter';
+
   static const TextStyle tabularMetric = TextStyle(
+    fontFamily: displayFont,
     fontFeatures: [FontFeature.tabularFigures()],
     fontWeight: FontWeight.w700,
     letterSpacing: -0.4,
@@ -173,9 +177,43 @@ abstract final class HiloTheme {
       outlineVariant: colors.border,
     );
 
+    final baseTextTheme = ThemeData(brightness: brightness).textTheme.apply(
+          fontFamily: bodyFont,
+          bodyColor: colors.textPrimary,
+          displayColor: colors.textPrimary,
+        );
+
+    final textTheme = baseTextTheme.copyWith(
+      displayLarge: baseTextTheme.displayLarge?.copyWith(fontFamily: displayFont),
+      displayMedium: baseTextTheme.displayMedium?.copyWith(fontFamily: displayFont),
+      displaySmall: baseTextTheme.displaySmall?.copyWith(fontFamily: displayFont),
+      headlineLarge: baseTextTheme.headlineLarge?.copyWith(
+        fontFamily: displayFont,
+        fontWeight: FontWeight.w700,
+      ),
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+        fontFamily: displayFont,
+        fontWeight: FontWeight.w700,
+      ),
+      headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+        fontFamily: displayFont,
+        fontWeight: FontWeight.w700,
+      ),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(
+        fontFamily: displayFont,
+        fontWeight: FontWeight.w700,
+      ),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(
+        fontFamily: displayFont,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
+      fontFamily: bodyFont,
+      textTheme: textTheme,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colors.canvas,
       extensions: [colors],
@@ -186,6 +224,7 @@ abstract final class HiloTheme {
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
+          fontFamily: displayFont,
           color: colors.textPrimary,
           fontSize: 24,
           fontWeight: FontWeight.w700,
