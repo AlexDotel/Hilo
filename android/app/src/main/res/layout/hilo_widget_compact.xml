@@ -21,8 +21,8 @@
         android:id="@+id/compact_heatmap_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
         android:layout_weight="1"
         android:contentDescription="Mapa de calor del hábito"
         android:scaleType="fitCenter" />
@@ -37,22 +37,27 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:paddingEnd="6dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/compact_weekly"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="#1C1917"
-                android:textSize="12sp"
+                android:textSize="11.5sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/compact_streak"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="#78716C"
-                android:textSize="11sp" />
+                android:textSize="10.5sp" />
         </LinearLayout>
 
         <TextView

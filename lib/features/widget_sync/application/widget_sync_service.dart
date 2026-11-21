@@ -76,13 +76,23 @@ final class WidgetSyncService {
           logs: logs,
           today: today,
         );
-        final miniGrid = heatmapBuilder.buildGrid(
-          activeHabits: [habit],
-          logs: logs,
-          today: today,
-          weeks: 5,
-          filterHabit: habit,
-        );
+        final habitLogsByDate = <LocalDate, HabitLog>{
+          for (final l in logs)
+            if (l.habitId == habit.id) l.date: l,
+        };
+        final compact45 = <int>[];
+        for (var offset = 44; offset >= 0; offset--) {
+          final d = today.subtractDays(offset);
+          final dLog = habitLogsByDate[d];
+          if (dLog == null || dLog.isRestDay) {
+            compact45.add(0);
+          } else if (habit.type == HabitType.binary) {
+            compact45.add(dLog.isCompleted ? 4 : 0);
+          } else {
+            final ratio = (dLog.value / habit.targetValue).clamp(0.0, 1.0);
+            compact45.add(HeatmapBuilder.ratioToLevel(ratio));
+          }
+        }
 
         final progressLabel = habit.type == HabitType.quantitative
             ? '${(log?.value ?? 0).toStringAsFixed(0)}/${habit.targetValue.toStringAsFixed(0)}'
@@ -101,7 +111,7 @@ final class WidgetSyncService {
             weeklySummary: weeklySummary,
             currentStreak: habitStreak.currentStreak,
             colorHex: habit.colorHex,
-            compactHeatmapLevels: miniGrid.map((c) => c.level).toList(),
+            compactHeatmapLevels: compact45,
           ),
         );
       }

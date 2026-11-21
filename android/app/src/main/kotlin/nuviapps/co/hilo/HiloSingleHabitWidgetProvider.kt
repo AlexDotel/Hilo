@@ -47,14 +47,14 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
             views.setTextViewText(R.id.compact_streak, "Racha actual: ${streak}d")
             views.setTextViewText(R.id.compact_action_btn, if (done) "✓" else "+")
 
-            val miniLevels = parseLevels(firstHabit?.optJSONArray("miniGrid"), 35)
+            val miniLevels = parseLevels(firstHabit?.optJSONArray("miniGrid"), 45)
             val bitmap = HeatmapBitmapRenderer.render(
                 context = context,
                 levels = miniLevels,
-                columns = 5,
-                rows = 7,
-                cellSizeDp = 11f,
-                gapDp = 3f,
+                columns = 9,
+                rows = 5,
+                cellSizeDp = 12f,
+                gapDp = 2.8f,
                 isDark = false,
             )
             views.setImageViewBitmap(R.id.compact_heatmap_image, bitmap)
