@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#191C20"/>
+      <stop offset="100%" stop-color="#111316"/>
+    </linearGradient>
+  </defs>
+  <!-- Full-bleed obsidian background (masked by launcher squircle/circle) -->
+  <rect width="1024" height="1024" fill="url(#bgGrad)"/>
+
+  <!-- Geometric 'H' formed by 7 GitHub-style emerald heatmap cells -->
+  <!-- Column 1 (Left) -->
+  <rect x="206" y="206" width="184" height="184" rx="40" fill="#1E6B47"/>
+  <rect x="206" y="420" width="184" height="184" rx="40" fill="#258257"/>
+  <rect x="206" y="634" width="184" height="184" rx="40" fill="#174530"/>
+
+  <!-- Column 2 (Center Bridge) -->
+  <rect x="420" y="420" width="184" height="184" rx="40" fill="#2FA870"/>
+
+  <!-- Column 3 (Right - Luminous Emerald) -->
+  <rect x="634" y="206" width="184" height="184" rx="40" fill="#3CD08B"/>
+  <rect x="634" y="420" width="184" height="184" rx="40" fill="#33BD7C"/>
+  <rect x="634" y="634" width="184" height="184" rx="40" fill="#48E29A"/>
+</svg>

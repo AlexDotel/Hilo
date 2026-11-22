@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Transparent-background foreground mark (safe-zone padded for Adaptive Icons) -->
+  <rect x="258" y="258" width="152" height="152" rx="34" fill="#1E6B47"/>
+  <rect x="258" y="436" width="152" height="152" rx="34" fill="#258257"/>
+  <rect x="258" y="614" width="152" height="152" rx="34" fill="#174530"/>
+  <rect x="436" y="436" width="152" height="152" rx="34" fill="#2FA870"/>
+  <rect x="614" y="258" width="152" height="152" rx="34" fill="#3CD08B"/>
+  <rect x="614" y="436" width="152" height="152" rx="34" fill="#33BD7C"/>
+  <rect x="614" y="614" width="152" height="152" rx="34" fill="#48E29A"/>
+</svg>

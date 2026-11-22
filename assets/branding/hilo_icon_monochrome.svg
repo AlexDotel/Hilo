@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Monochrome Material You themed icon silhouette -->
+  <rect x="258" y="258" width="152" height="152" rx="34" fill="#FFFFFF" fill-opacity="0.72"/>
+  <rect x="258" y="436" width="152" height="152" rx="34" fill="#FFFFFF" fill-opacity="0.82"/>
+  <rect x="258" y="614" width="152" height="152" rx="34" fill="#FFFFFF" fill-opacity="0.58"/>
+  <rect x="436" y="436" width="152" height="152" rx="34" fill="#FFFFFF" fill-opacity="0.90"/>
+  <rect x="614" y="258" width="152" height="152" rx="34" fill="#FFFFFF"/>
+  <rect x="614" y="436" width="152" height="152" rx="34" fill="#FFFFFF" fill-opacity="0.95"/>
+  <rect x="614" y="614" width="152" height="152" rx="34" fill="#FFFFFF"/>
+</svg>
