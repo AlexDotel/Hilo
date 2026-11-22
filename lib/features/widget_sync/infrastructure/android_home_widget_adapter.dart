@@ -20,7 +20,6 @@ final class AndroidHomeWidgetAdapter implements WidgetBridgePort {
 
   static const String snapshotStorageKey = 'hilo_widget_snapshot_json';
   static const String standardProviderName = 'HiloWidgetProvider';
-  static const String expandedProviderName = 'HiloExpandedWidgetProvider';
   static const String compactProviderName = 'HiloSingleHabitWidgetProvider';
 
   @override
@@ -33,10 +32,6 @@ final class AndroidHomeWidgetAdapter implements WidgetBridgePort {
       await HomeWidget.updateWidget(
         androidName: standardProviderName,
         qualifiedAndroidName: 'nuviapps.co.hilo.$standardProviderName',
-      );
-      await HomeWidget.updateWidget(
-        androidName: expandedProviderName,
-        qualifiedAndroidName: 'nuviapps.co.hilo.$expandedProviderName',
       );
       await HomeWidget.updateWidget(
         androidName: compactProviderName,
