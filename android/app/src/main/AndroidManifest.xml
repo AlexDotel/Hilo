@@ -26,10 +26,10 @@
             </intent-filter>
         </activity>
 
-        <!-- 4x2 Standard Heatmap & Quick Check-in Widget -->
+        <!-- 4x3 Standard Heatmap & Quick Check-in Widget -->
         <receiver
             android:name=".HiloWidgetProvider"
-            android:label="Hilo · Mapa de Calor (4x2)"
+            android:label="Hilo · Mapa de Calor (4x3)"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
