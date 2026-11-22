@@ -4,94 +4,64 @@
     android:layout_height="match_parent"
     android:background="@drawable/hilo_widget_bg_dark"
     android:orientation="vertical"
-    android:padding="14dp">
+    android:padding="12dp">
 
     <LinearLayout
         android:id="@+id/compact_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/compact_title"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Hilo"
-            android:textColor="#F5F5F4"
-            android:textSize="16sp"
+            android:textColor="#A1A1AA"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/compact_streak_badge"
-            android:layout_width="wrap_content"
+            android:id="@+id/compact_streak_big"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/hilo_widget_badge_bg"
-            android:paddingLeft="10dp"
-            android:paddingTop="3dp"
-            android:paddingRight="10dp"
-            android:paddingBottom="3dp"
+            android:layout_marginTop="2dp"
             android:text="0d"
             android:textColor="#3CD08B"
-            android:textSize="12sp"
+            android:textSize="28sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/compact_weekly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="0/7 esta semana"
+            android:textColor="#F5F5F4"
+            android:textSize="11sp" />
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/compact_heatmap_image"
+        android:id="@+id/compact_week_bar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_weight="1"
-        android:contentDescription="Mapa de calor del hábito"
+        android:contentDescription="Progreso de esta semana"
         android:scaleType="fitCenter" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/compact_action_btn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingEnd="8dp">
-
-            <TextView
-                android:id="@+id/compact_weekly"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="#F5F5F4"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/compact_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="#A1A1AA"
-                android:textSize="11sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/compact_action_btn"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:background="@drawable/hilo_widget_fab_bg"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:layout_height="32dp"
+        android:background="@drawable/hilo_widget_pill_btn_bg"
+        android:gravity="center"
+        android:text="+ Registrar"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold" />
 </LinearLayout>

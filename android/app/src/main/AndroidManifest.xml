@@ -26,10 +26,10 @@
             </intent-filter>
         </activity>
 
-        <!-- 4x3 Standard Heatmap & Quick Check-in Widget -->
+        <!-- 4x2 Standard Heatmap & Quick Check-in Widget -->
         <receiver
             android:name=".HiloWidgetProvider"
-            android:label="Hilo · Mapa de Calor (4x3)"
+            android:label="Hilo · Mapa de Calor (4x2)"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -39,10 +39,23 @@
                 android:resource="@xml/hilo_widget_standard_info" />
         </receiver>
 
-        <!-- 3x2 Single-Habit Heatmap Widget -->
+        <!-- 4x4 Expanded Dashboard Widget -->
+        <receiver
+            android:name=".HiloExpandedWidgetProvider"
+            android:label="Hilo · Dashboard Completo (4x4)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/hilo_widget_expanded_info" />
+        </receiver>
+
+        <!-- 2x2 Compact Quick Habit Widget (Streak + 7-day bar + Check-in) -->
         <receiver
             android:name=".HiloSingleHabitWidgetProvider"
-            android:label="Hilo · Hábito Individual (3x2)"
+            android:label="Hilo · Hábito Rápido (2x2)"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

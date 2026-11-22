@@ -12,9 +12,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * 4x2 Wide Android Home Screen widget for a single highlighted habit
- * matching the full-width 16-week GitHub heatmap layout with streak badge
- * and one-tap check-in button.
+ * 2x2 Compact Android Home Screen widget redesigned specifically for a square
+ * footprint: big streak counter, crisp full-width 7-day (Mon..Sun) emerald bar,
+ * and a full-width one-tap check-in pill button.
  */
 class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
 
@@ -38,28 +38,31 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
             views.setOnClickPendingIntent(R.id.compact_header, launchIntent)
 
             val title = firstHabit?.optString("title", "Hilo") ?: "Hilo"
-            val weekly = firstHabit?.optString("weekly", "Crea un hábito") ?: "Crea un hábito"
+            val weekly = firstHabit?.optString("weekly", "0/7 esta semana") ?: "0/7 esta semana"
             val streak = firstHabit?.optInt("streak", 0) ?: 0
             val done = firstHabit?.optBoolean("done", false) ?: false
             val habitId = firstHabit?.optString("id", "") ?: ""
 
             views.setTextViewText(R.id.compact_title, title)
-            views.setTextViewText(R.id.compact_streak_badge, "${streak}d")
+            views.setTextViewText(R.id.compact_streak_big, "${streak}d")
             views.setTextViewText(R.id.compact_weekly, weekly)
-            views.setTextViewText(R.id.compact_status, if (done) "Completado hoy" else "Toca + para registrar")
-            views.setTextViewText(R.id.compact_action_btn, if (done) "✓" else "+")
+            views.setTextViewText(
+                R.id.compact_action_btn,
+                if (done) "✓ Completado" else "+ Registrar",
+            )
 
-            val levels = parseTrailingLevels(firstHabit?.optJSONArray("miniGrid"), 84)
+            // Crisp single-row 7-day (Mon..Sun) emerald bar spanning 100% width
+            val weekLevels = parseLevels(firstHabit?.optJSONArray("miniGrid"), 7)
             val bitmap = HeatmapBitmapRenderer.render(
                 context = context,
-                levels = levels,
-                columns = 12,
-                rows = 7,
-                cellSizeDp = 11f,
-                gapDp = 2.5f,
+                levels = weekLevels,
+                columns = 7,
+                rows = 1,
+                cellSizeDp = 16f,
+                gapDp = 4f,
                 isDark = true,
             )
-            views.setImageViewBitmap(R.id.compact_heatmap_image, bitmap)
+            views.setImageViewBitmap(R.id.compact_week_bar, bitmap)
 
             if (habitId.isNotEmpty()) {
                 val uri = Uri.Builder()
@@ -76,15 +79,12 @@ class HiloSingleHabitWidgetProvider : HomeWidgetProvider() {
         }
     }
 
-    private fun parseTrailingLevels(array: JSONArray?, expectedSize: Int): IntArray {
+    private fun parseLevels(array: JSONArray?, expectedSize: Int): IntArray {
         val result = IntArray(expectedSize)
-        if (array == null || array.length() == 0) return result
-        val srcLen = array.length()
-        val start = (srcLen - expectedSize).coerceAtLeast(0)
-        val count = minOf(srcLen, expectedSize)
-        val destOffset = expectedSize - count
+        if (array == null) return result
+        val count = minOf(array.length(), expectedSize)
         for (i in 0 until count) {
-            result[destOffset + i] = array.optInt(start + i, 0).coerceIn(0, 4)
+            result[i] = array.optInt(i, 0).coerceIn(0, 4)
         }
         return result
     }

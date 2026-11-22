@@ -70,20 +70,30 @@ final class WidgetSyncService {
         if (isDone) completedToday++;
       }
 
-      if (widgetItems.length < 3) {
+      if (widgetItems.length < 5) {
         final habitStreak = streakEngine.evaluateHabit(
           habit: habit,
           logs: logs,
           today: today,
         );
-        final singleHabitGrid = heatmapBuilder.buildGrid(
-          activeHabits: [habit],
-          logs: logs,
-          today: today,
-          weeks: 16,
-          filterHabit: habit,
-          shieldDates: habitStreak.autoShieldDates,
-        );
+        final habitLogsByDate = <LocalDate, HabitLog>{
+          for (final l in logs)
+            if (l.habitId == habit.id) l.date: l,
+        };
+        final weekStart = today.startOfWeek;
+        final weekLevels = <int>[];
+        for (var d = 0; d < 7; d++) {
+          final date = weekStart.addDays(d);
+          final dLog = habitLogsByDate[date];
+          if (date > today || dLog == null || dLog.isRestDay) {
+            weekLevels.add(0);
+          } else if (habit.type == HabitType.binary) {
+            weekLevels.add(dLog.isCompleted ? 4 : 0);
+          } else {
+            final ratio = (dLog.value / habit.targetValue).clamp(0.0, 1.0);
+            weekLevels.add(HeatmapBuilder.ratioToLevel(ratio));
+          }
+        }
 
         final progressLabel = habit.type == HabitType.quantitative
             ? '${(log?.value ?? 0).toStringAsFixed(0)}/${habit.targetValue.toStringAsFixed(0)}'
@@ -102,8 +112,7 @@ final class WidgetSyncService {
             weeklySummary: weeklySummary,
             currentStreak: habitStreak.currentStreak,
             colorHex: habit.colorHex,
-            compactHeatmapLevels:
-                singleHabitGrid.map((c) => c.level).toList(),
+            compactHeatmapLevels: weekLevels,
           ),
         );
       }
